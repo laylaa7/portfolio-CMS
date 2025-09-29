@@ -29,15 +29,23 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Protect admin routes
-  if (request.nextUrl.pathname.startsWith("/admin") && !request.nextUrl.pathname.startsWith("/admin/login") && !user) {
+  // Protect admin routes except login and signup
+  if (
+    request.nextUrl.pathname.startsWith("/admin") &&
+    !request.nextUrl.pathname.startsWith("/admin/login") &&
+    !request.nextUrl.pathname.startsWith("/admin/signup") &&
+    !user
+  ) {
     const url = request.nextUrl.clone()
     url.pathname = "/admin/login"
     return NextResponse.redirect(url)
   }
 
-  // Redirect logged-in users away from login page
-  if (request.nextUrl.pathname.startsWith("/admin/login") && user) {
+  // Redirect logged-in users away from login and signup pages
+  if (
+    (request.nextUrl.pathname.startsWith("/admin/login") || request.nextUrl.pathname.startsWith("/admin/signup")) &&
+    user
+  ) {
     const url = request.nextUrl.clone()
     url.pathname = "/admin"
     return NextResponse.redirect(url)

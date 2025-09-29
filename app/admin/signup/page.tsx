@@ -40,16 +40,21 @@ export default function AdminSignupPage() {
     }
 
     try {
-      const { error } = await supabase.auth.signUp({
+      console.log("[v0] Starting signup process...")
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || `${window.location.origin}/admin`,
         },
       })
+
+      console.log("[v0] Signup response:", { data, error })
+
       if (error) throw error
       setSuccess(true)
     } catch (error: unknown) {
+      console.error("[v0] Signup error:", error)
       setError(error instanceof Error ? error.message : "An error occurred")
     } finally {
       setIsLoading(false)
