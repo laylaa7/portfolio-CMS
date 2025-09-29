@@ -9,81 +9,91 @@ export default async function AboutPage() {
   const { data: about } = await supabase.from("about").select("*").single()
 
   return (
-    <div className="container py-12 md:py-16">
-      <div className="mx-auto max-w-4xl">
-        <div className="mb-12 text-center">
-          <h1 className="mb-4 text-4xl font-bold tracking-tight md:text-5xl">About Mohamed</h1>
-        </div>
+    <div className="min-h-screen py-24 md:py-32">
+      <div className="container mx-auto px-4">
+        <div className="mx-auto max-w-4xl">
+          <div className="mb-16 text-center">
+            <h1 className="mb-6 text-5xl font-bold tracking-tight md:text-6xl lg:text-7xl text-balance">
+              About Mohamed
+            </h1>
+          </div>
 
-        {about ? (
-          <div className="space-y-8">
-            {about.image_url && (
-              <div className="mx-auto w-48 h-48 rounded-full overflow-hidden">
-                <img
-                  src={about.image_url || "/placeholder.svg"}
-                  alt="Mohamed Elaghoury"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            )}
-
-            <Card>
-              <CardContent className="pt-6">
-                <div className="prose prose-lg max-w-none">
-                  <p className="whitespace-pre-wrap leading-relaxed text-foreground">{about.bio}</p>
+          {about ? (
+            <div className="space-y-12">
+              {about.image_url && (
+                <div className="mx-auto w-56 h-56 rounded-full overflow-hidden ring-4 ring-accent/20">
+                  <img
+                    src={about.image_url || "/placeholder.svg"}
+                    alt="Mohamed Elaghoury"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
-              </CardContent>
-            </Card>
+              )}
 
-            {about.contact_info && (
-              <Card>
-                <CardContent className="pt-6">
-                  <h2 className="mb-4 text-2xl font-bold">Get in Touch</h2>
-                  <div className="space-y-4">
-                    {about.contact_info.email && (
-                      <div className="flex items-center gap-3">
-                        <Mail className="h-5 w-5 text-muted-foreground" />
-                        <a href={`mailto:${about.contact_info.email}`} className="text-primary hover:underline">
-                          {about.contact_info.email}
-                        </a>
-                      </div>
-                    )}
-                    {about.contact_info.phone && (
-                      <div className="flex items-center gap-3">
-                        <Phone className="h-5 w-5 text-muted-foreground" />
-                        <a href={`tel:${about.contact_info.phone}`} className="text-primary hover:underline">
-                          {about.contact_info.phone}
-                        </a>
-                      </div>
-                    )}
-                    {about.contact_info.linkedin && (
-                      <div className="flex items-center gap-3">
-                        <Linkedin className="h-5 w-5 text-muted-foreground" />
-                        <a
-                          href={about.contact_info.linkedin}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-primary hover:underline"
-                        >
-                          LinkedIn Profile
-                        </a>
-                      </div>
-                    )}
-                  </div>
-                  <div className="mt-6">
-                    <Button asChild className="bg-secondary text-secondary-foreground hover:bg-secondary/90">
-                      <Link href="/contact">Send a Message</Link>
-                    </Button>
+              <Card className="border-2">
+                <CardContent className="pt-8 pb-8">
+                  <div className="prose prose-lg max-w-none">
+                    <p className="whitespace-pre-wrap leading-relaxed text-foreground text-lg">{about.bio}</p>
                   </div>
                 </CardContent>
               </Card>
-            )}
-          </div>
-        ) : (
-          <div className="text-center py-16">
-            <p className="text-muted-foreground">About information coming soon</p>
-          </div>
-        )}
+
+              {about.contact_info && (
+                <Card className="border-2">
+                  <CardContent className="pt-8 pb-8">
+                    <h2 className="mb-6 text-3xl font-bold text-center">Get in Touch</h2>
+                    <div className="space-y-6 max-w-md mx-auto">
+                      {about.contact_info.email && (
+                        <div className="flex items-center gap-4 justify-center">
+                          <Mail className="h-6 w-6 text-accent" />
+                          <a
+                            href={`mailto:${about.contact_info.email}`}
+                            className="text-primary hover:text-accent transition-colors text-lg"
+                          >
+                            {about.contact_info.email}
+                          </a>
+                        </div>
+                      )}
+                      {about.contact_info.phone && (
+                        <div className="flex items-center gap-4 justify-center">
+                          <Phone className="h-6 w-6 text-accent" />
+                          <a
+                            href={`tel:${about.contact_info.phone}`}
+                            className="text-primary hover:text-accent transition-colors text-lg"
+                          >
+                            {about.contact_info.phone}
+                          </a>
+                        </div>
+                      )}
+                      {about.contact_info.linkedin && (
+                        <div className="flex items-center gap-4 justify-center">
+                          <Linkedin className="h-6 w-6 text-accent" />
+                          <a
+                            href={about.contact_info.linkedin}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:text-accent transition-colors text-lg"
+                          >
+                            LinkedIn Profile
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                    <div className="mt-8 text-center">
+                      <Button asChild size="lg" className="px-8">
+                        <Link href="/contact">Send a Message</Link>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          ) : (
+            <div className="text-center py-24">
+              <p className="text-muted-foreground text-lg">About information coming soon</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

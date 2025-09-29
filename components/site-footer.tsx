@@ -4,7 +4,7 @@ import { Linkedin, Mail, Phone } from "lucide-react"
 export function SiteFooter() {
   return (
     <footer className="border-t border-border/40 bg-muted/30">
-      <div className="container py-12">
+      <div className="container py-12 mx-[100px] shadow-none">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           <div className="space-y-3">
             <h3 className="text-lg font-semibold text-primary">Mohamed Elaghoury</h3>
