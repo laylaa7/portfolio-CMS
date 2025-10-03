@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { ImageUpload } from "@/components/ui/image-upload"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
@@ -78,16 +79,11 @@ export function AboutForm({ about }: { about?: About | null }) {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="image_url">Profile Image URL</Label>
-            <Input
-              id="image_url"
-              type="url"
-              placeholder="https://example.com/profile.jpg"
-              value={formData.image_url}
-              onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-            />
-          </div>
+          <ImageUpload
+            value={formData.image_url}
+            onChange={(url) => setFormData({ ...formData, image_url: url })}
+            label="Profile Image"
+          />
 
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Contact Information</h3>

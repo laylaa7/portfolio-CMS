@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { ImageUpload } from "@/components/ui/image-upload"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
@@ -21,6 +22,7 @@ export function BlogForm({ blog }: { blog?: Blog }) {
     content: blog?.content || "",
     tags: blog?.tags?.join(", ") || "",
     author: blog?.author || "",
+    image_url: blog?.image_url || "",
   })
 
   const generateSlug = (title: string) => {
@@ -52,6 +54,7 @@ export function BlogForm({ blog }: { blog?: Blog }) {
         .map((tag) => tag.trim())
         .filter((tag) => tag),
       author: formData.author,
+      image_url: formData.image_url,
     }
 
     if (blog) {
@@ -129,6 +132,12 @@ export function BlogForm({ blog }: { blog?: Blog }) {
               onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
             />
           </div>
+
+          <ImageUpload
+            value={formData.image_url}
+            onChange={(url) => setFormData({ ...formData, image_url: url })}
+            label="Featured Image"
+          />
 
           <div className="flex gap-4">
             <Button

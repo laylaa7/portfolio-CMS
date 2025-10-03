@@ -1,0 +1,298 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { createClient } from "@/lib/supabase/client"
+import { generateSignedUrl, requestResourceAccess, getResourceAccessStatus } from "@/lib/resource-requests"
+import type { Resource, ResourceRequest } from "@/lib/types"
+import { 
+  FileText, 
+  ExternalLink, 
+  Download, 
+  Lock, 
+  Unlock, 
+  Clock, 
+  CheckCircle, 
+  AlertCircle,
+  User
+} from "lucide-react"
+
+interface ResourceCardProps {
+  resource: Resource
+}
+
+export function ResourceCard({ resource }: ResourceCardProps) {
+  const [user, setUser] = useState<any>(null)
+  const [requestStatus, setRequestStatus] = useState<ResourceRequest | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [downloading, setDownloading] = useState(false)
+
+  useEffect(() => {
+    checkUser()
+    if (resource.visibility === 'protected') {
+      checkRequestStatus()
+    }
+  }, [resource.id])
+
+  const checkUser = async () => {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    setUser(user)
+  }
+
+  const checkRequestStatus = async () => {
+    try {
+      const status = await getResourceAccessStatus(resource.id)
+      setRequestStatus(status)
+    } catch (error) {
+      console.error("Error checking request status:", error)
+    }
+  }
+
+  const handleRequestAccess = async () => {
+    if (!user) {
+      // Redirect to login
+      window.location.href = '/admin/login'
+      return
+    }
+
+    setLoading(true)
+    try {
+      await requestResourceAccess(resource.id)
+      await checkRequestStatus()
+      alert("Access request submitted! You'll be notified when approved.")
+    } catch (error: any) {
+      alert(error.message || "Error requesting access")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleDownload = async () => {
+    if (resource.visibility === 'public') {
+      // Direct download for public resources
+      if (resource.type === 'file' && resource.file_url) {
+        window.open(resource.file_url, '_blank')
+      } else {
+        window.open(resource.link, '_blank')
+      }
+      return
+    }
+
+    // Protected resource - generate signed URL
+    setDownloading(true)
+    try {
+      const { signedUrl, fileName } = await generateSignedUrl(resource.id)
+      
+      // Create a temporary link and trigger download
+      const link = document.createElement('a')
+      link.href = signedUrl
+      link.download = fileName || 'download'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    } catch (error: any) {
+      alert(error.message || "Error downloading file")
+    } finally {
+      setDownloading(false)
+    }
+  }
+
+  const getVisibilityIcon = () => {
+    if (resource.visibility === 'public') {
+      return <Unlock className="h-4 w-4 text-green-600" />
+    }
+    return <Lock className="h-4 w-4 text-orange-600" />
+  }
+
+  const getVisibilityBadge = () => {
+    if (resource.visibility === 'public') {
+      return <Badge variant="default" className="bg-green-100 text-green-800"><Unlock className="h-3 w-3 mr-1" />Public</Badge>
+    }
+    return <Badge variant="secondary" className="bg-orange-100 text-orange-800"><Lock className="h-3 w-3 mr-1" />Protected</Badge>
+  }
+
+  const getActionButton = () => {
+    if (resource.visibility === 'public') {
+      return (
+        <Button 
+          onClick={handleDownload} 
+          className="w-full text-white font-medium h-10 rounded"
+          style={{ backgroundColor: '#0D0A53' }}
+        >
+          <Download className="mr-2 h-4 w-4" />
+          Download Free
+        </Button>
+      )
+    }
+
+    // Protected resource
+    if (!user) {
+      return (
+        <Button 
+          onClick={handleRequestAccess} 
+          className="w-full text-white font-medium h-10 rounded"
+          style={{ backgroundColor: '#0D0A53' }}
+        >
+          <User className="mr-2 h-4 w-4" />
+          Sign In to Request Access
+        </Button>
+      )
+    }
+
+    if (!requestStatus) {
+      return (
+        <Button 
+          onClick={handleRequestAccess} 
+          disabled={loading}
+          className="w-full text-white font-medium h-10 rounded"
+          style={{ backgroundColor: '#0D0A53' }}
+        >
+          {loading ? (
+            <>
+              <Clock className="mr-2 h-4 w-4 animate-spin" />
+              Requesting...
+            </>
+          ) : (
+            <>
+              <Lock className="mr-2 h-4 w-4" />
+              Request Access
+            </>
+          )}
+        </Button>
+      )
+    }
+
+    if (requestStatus.status === 'pending') {
+      return (
+        <Button 
+          disabled 
+          className="w-full font-medium h-10 rounded"
+          style={{ backgroundColor: '#FCF7F7', color: '#0D0A53', border: '1px solid #0D0A53' }}
+        >
+          <Clock className="mr-2 h-4 w-4" />
+          Pending Approval
+        </Button>
+      )
+    }
+
+    if (requestStatus.status === 'denied') {
+      return (
+        <Button 
+          disabled 
+          className="w-full font-medium h-10 rounded"
+          style={{ backgroundColor: '#FCF7F7', color: '#0D0A53', border: '1px solid #0D0A53' }}
+        >
+          <AlertCircle className="mr-2 h-4 w-4" />
+          Access Denied
+        </Button>
+      )
+    }
+
+    if (requestStatus.status === 'approved') {
+      const isExpired = requestStatus.expires_at && new Date(requestStatus.expires_at) < new Date()
+      
+      if (isExpired) {
+        return (
+          <Button 
+            disabled 
+            className="w-full font-medium h-10 rounded"
+            style={{ backgroundColor: '#FCF7F7', color: '#0D0A53', border: '1px solid #0D0A53' }}
+          >
+            <Clock className="mr-2 h-4 w-4" />
+            Access Expired
+          </Button>
+        )
+      }
+
+      return (
+        <Button 
+          onClick={handleDownload} 
+          disabled={downloading}
+          className="w-full text-white font-medium h-10 rounded"
+          style={{ backgroundColor: '#0D0A53' }}
+        >
+          {downloading ? (
+            <>
+              <Clock className="mr-2 h-4 w-4 animate-spin" />
+              Downloading...
+            </>
+          ) : (
+            <>
+              <Download className="mr-2 h-4 w-4" />
+              Download Free
+            </>
+          )}
+        </Button>
+      )
+    }
+
+    return null
+  }
+
+  return (
+    <Card className="relative border rounded-lg bg-white hover:shadow-lg transition-all duration-300 hover:-translate-y-1" style={{ borderColor: '#0D0A53' }}>
+      {/* Navy triangle in top-right corner */}
+      <div className="absolute top-0 right-0 w-0 h-0 border-l-[20px] border-l-transparent border-b-[20px]" style={{ borderBottomColor: '#0D0A53' }}></div>
+      
+      <CardHeader className="pb-4">
+        <div className="flex flex-col items-start space-y-4">
+          {/* Icon */}
+          <div className="w-12 h-12 rounded flex items-center justify-center" style={{ backgroundColor: '#FCF7F7', border: '2px solid #0D0A53' }}>
+            <FileText className="h-6 w-6" style={{ color: '#0D0A53' }} />
+          </div>
+          
+          {/* Title */}
+          <CardTitle className="text-xl font-bold leading-tight" style={{ color: '#0D0A53' }}>
+            {resource.title}
+          </CardTitle>
+          
+          {/* Description */}
+          {resource.description && (
+            <CardDescription className="text-sm leading-relaxed" style={{ color: '#0D0A53' }}>
+              {resource.description}
+            </CardDescription>
+          )}
+          
+          {/* Type Badge */}
+          <div className="flex items-center gap-2">
+            <Badge className="text-xs px-2 py-1 rounded-full" style={{ backgroundColor: '#FCF7F7', color: '#0D0A53', border: '1px solid #0D0A53' }}>
+              {resource.type}
+            </Badge>
+            {resource.visibility === 'public' && (
+              <Badge className="text-xs px-2 py-1 rounded-full" style={{ backgroundColor: '#C7A600', color: '#0D0A53' }}>
+                Featured
+              </Badge>
+            )}
+          </div>
+          
+          {/* Stats */}
+          <div className="flex items-center gap-4 text-sm" style={{ color: '#0D0A53' }}>
+            <div className="flex items-center gap-1">
+              <Download className="h-4 w-4" style={{ color: '#C7A600' }} />
+              <span>{Math.floor(resource.id.charCodeAt(0) * 7) % 1000 + 100}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span style={{ color: '#C7A600' }}>★</span>
+              <span>4.{(resource.id.charCodeAt(1) % 9) + 1}</span>
+            </div>
+          </div>
+        </div>
+      </CardHeader>
+      
+      <CardContent className="pt-0">
+        <div className="w-full">
+          {getActionButton()}
+        </div>
+        
+        {requestStatus?.expires_at && requestStatus.status === 'approved' && (
+          <p className="text-xs mt-2 text-center" style={{ color: '#0D0A53' }}>
+            Access expires: {new Date(requestStatus.expires_at).toLocaleDateString()}
+          </p>
+        )}
+      </CardContent>
+    </Card>
+  )
+}

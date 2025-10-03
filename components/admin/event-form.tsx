@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { ImageUpload } from "@/components/ui/image-upload"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
@@ -21,7 +22,22 @@ export function EventForm({ event }: { event?: Event }) {
     location: event?.location || "",
     description: event?.description || "",
     image_url: event?.image_url || "",
+    tools: event?.tools || [],
   })
+  
+  const [toolsInput, setToolsInput] = useState(
+    event?.tools ? event.tools.join(", ") : ""
+  )
+
+  const handleToolsChange = (value: string) => {
+    setToolsInput(value)
+    // Convert comma-separated string to array
+    const toolsArray = value
+      .split(",")
+      .map(tool => tool.trim())
+      .filter(tool => tool.length > 0)
+    setFormData({ ...formData, tools: toolsArray })
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -106,15 +122,23 @@ export function EventForm({ event }: { event?: Event }) {
             />
           </div>
 
+          <ImageUpload
+            value={formData.image_url}
+            onChange={(url) => setFormData({ ...formData, image_url: url })}
+            label="Event Image"
+          />
+
           <div className="space-y-2">
-            <Label htmlFor="image_url">Image URL</Label>
+            <Label htmlFor="tools">Tools & Resources</Label>
             <Input
-              id="image_url"
-              type="url"
-              placeholder="https://example.com/image.jpg"
-              value={formData.image_url}
-              onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+              id="tools"
+              placeholder="e.g., Workshop Materials, Networking, Q&A Session (comma-separated)"
+              value={toolsInput}
+              onChange={(e) => handleToolsChange(e.target.value)}
             />
+            <p className="text-sm text-muted-foreground">
+              Enter tools, resources, or event features, separated by commas
+            </p>
           </div>
 
           <div className="flex gap-4">

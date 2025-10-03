@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { ImageUpload } from "@/components/ui/image-upload"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
@@ -20,7 +21,22 @@ export function ServiceForm({ service }: { service?: Service }) {
     description: service?.description || "",
     price: service?.price || "",
     image_url: service?.image_url || "",
+    tools: service?.tools || [],
   })
+  
+  const [toolsInput, setToolsInput] = useState(
+    service?.tools ? service.tools.join(", ") : ""
+  )
+
+  const handleToolsChange = (value: string) => {
+    setToolsInput(value)
+    // Convert comma-separated string to array
+    const toolsArray = value
+      .split(",")
+      .map(tool => tool.trim())
+      .filter(tool => tool.length > 0)
+    setFormData({ ...formData, tools: toolsArray })
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -90,15 +106,23 @@ export function ServiceForm({ service }: { service?: Service }) {
             />
           </div>
 
+          <ImageUpload
+            value={formData.image_url}
+            onChange={(url) => setFormData({ ...formData, image_url: url })}
+            label="Service Image"
+          />
+
           <div className="space-y-2">
-            <Label htmlFor="image_url">Image URL</Label>
+            <Label htmlFor="tools">Tools & Technologies</Label>
             <Input
-              id="image_url"
-              type="url"
-              placeholder="https://example.com/image.jpg"
-              value={formData.image_url}
-              onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+              id="tools"
+              placeholder="e.g., ATD Framework, Assessment Tools, Study Guides (comma-separated)"
+              value={toolsInput}
+              onChange={(e) => handleToolsChange(e.target.value)}
             />
+            <p className="text-sm text-muted-foreground">
+              Enter tools, technologies, or methodologies used in this service, separated by commas
+            </p>
           </div>
 
           <div className="flex gap-4">
