@@ -22,9 +22,8 @@ export default async function AdminDashboardPage() {
   const { count: blogsCount } = await supabase.from("blogs").select("*", { count: "exact", head: true })
   const { count: resourcesCount } = await supabase.from("resources").select("*", { count: "exact", head: true })
   
-  // Get user count (this will be approximate since we can't count auth.users directly)
-  const { data: { users } } = await supabase.auth.admin.listUsers()
-  const usersCount = users.length
+  // Get user count from public.users table
+  const { count: usersCount } = await supabase.from("users").select("*", { count: "exact", head: true })
 
   return (
     <div className="min-h-screen bg-muted/30">
