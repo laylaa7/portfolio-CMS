@@ -22,20 +22,20 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <nav className="container flex h-20 items-center justify-between px-4">
+      <nav className="container flex h-16 sm:h-20 items-center justify-between px-3 sm:px-4 lg:px-6">
         <Link href="/" className="flex items-center space-x-2">
-          <span className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+          <span className="text-lg sm:text-xl lg:text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             Mohamed Elaghoury
           </span>
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex md:items-center md:gap-8">
+        <div className="hidden lg:flex lg:items-center lg:gap-4 xl:gap-6">
           {navigation.map((item) => (
             <Link
               key={item.name}
               href={item.href}
-              className={`text-sm font-semibold transition-colors hover:text-accent relative ${
+              className={`text-sm xl:text-base font-semibold transition-colors hover:text-accent relative px-2 py-1 ${
                 pathname === item.href ? "text-accent" : "text-foreground"
               }`}
             >
@@ -45,52 +45,52 @@ export function SiteHeader() {
               )}
             </Link>
           ))}
-          {/* Always show auth buttons - no loading state */}
+          {/* Auth buttons */}
           {user ? (
-            <div className="flex items-center gap-2 mr-2">
-              <span className="text-sm" style={{ color: '#0D0A53' }}>
+            <div className="flex items-center gap-2">
+              <span className="text-xs xl:text-sm hidden xl:inline" style={{ color: '#0D0A53' }}>
                 {user.user_metadata?.name || user.email}
               </span>
               {isAdmin && (
-                <Button asChild size="sm" variant="outline" className="border-2" style={{ borderColor: '#0D0A53', color: '#0D0A53' }}>
+                <Button asChild size="sm" variant="outline" className="border-2 text-xs xl:text-sm" style={{ borderColor: '#0D0A53', color: '#0D0A53' }}>
                   <Link href="/admin">Admin</Link>
                 </Button>
               )}
-              <Button 
-                size="sm" 
-                variant="outline" 
-                className="border-2" 
+              <Button
+                size="sm"
+                variant="outline"
+                className="border-2 text-xs xl:text-sm"
                 style={{ borderColor: '#0D0A53', color: '#0D0A53' }}
                 onClick={signOut}
               >
-                <LogOut className="h-4 w-4 mr-1" />
-                Logout
+                <LogOut className="h-3 w-3 xl:h-4 xl:w-4 mr-1" />
+                <span className="hidden sm:inline">Logout</span>
               </Button>
             </div>
           ) : (
-            <Button asChild size="sm" variant="outline" className="border-2 mr-2" style={{ borderColor: '#0D0A53', color: '#0D0A53' }}>
+            <Button asChild size="sm" variant="outline" className="border-2 text-xs xl:text-sm" style={{ borderColor: '#0D0A53', color: '#0D0A53' }}>
               <Link href="/login">Login</Link>
             </Button>
           )}
-          <Button asChild size="sm" className="bg-accent text-primary hover:bg-accent/90 font-semibold mx-0 text-center">
+          <Button asChild size="sm" className="bg-accent text-primary hover:bg-accent/90 font-semibold text-xs xl:text-sm">
             <Link href="/contact">Contact</Link>
           </Button>
         </div>
 
-        {/* Mobile Menu Button */}
+        {/* Tablet/Mobile Menu Button */}
         <Button
           variant="ghost"
           size="icon"
-          className="md:hidden hover:bg-accent/10"
+          className="lg:hidden hover:bg-accent/10 h-10 w-10"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
           {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </Button>
       </nav>
 
-      {/* Mobile Navigation */}
+      {/* Mobile/Tablet Navigation */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-border/40 bg-background/95 backdrop-blur">
+        <div className="lg:hidden border-t border-border/40 bg-background/95 backdrop-blur">
           <div className="container py-6 space-y-4 px-4">
             {navigation.map((item) => (
               <Link

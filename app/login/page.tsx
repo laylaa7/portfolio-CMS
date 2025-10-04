@@ -54,17 +54,17 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#FCF7F7' }}>
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen flex items-center justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#FCF7F7' }}>
+      <div className="max-w-md w-full space-y-6 sm:space-y-8">
         <Card className="border-2" style={{ borderColor: '#0D0A53' }}>
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold" style={{ color: '#0D0A53' }}>
+          <CardHeader className="text-center px-4 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-4">
+            <CardTitle className="text-xl sm:text-2xl font-bold" style={{ color: '#0D0A53' }}>
               {isSignup ? "Create Account" : "Sign In"}
             </CardTitle>
           </CardHeader>
           
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
+          <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
               {error && (
                 <div className="p-3 rounded-lg text-sm text-red-600 bg-red-50 border border-red-200">
                   {error}
@@ -122,7 +122,7 @@ export default function LoginPage() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full"
+                className="w-full h-10 sm:h-11 text-sm sm:text-base"
                 style={{ backgroundColor: '#0D0A53' }}
               >
                 {loading ? "Loading..." : (isSignup ? "Create Account" : "Sign In")}
@@ -136,7 +136,7 @@ export default function LoginPage() {
                     setIsSignup(!isSignup)
                     setError("")
                   }}
-                  className="text-sm"
+                  className="text-xs sm:text-sm"
                   style={{ color: '#C7A600' }}
                 >
                   {isSignup 

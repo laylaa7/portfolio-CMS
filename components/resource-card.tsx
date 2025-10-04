@@ -271,31 +271,31 @@ export function ResourceCard({ resource }: ResourceCardProps) {
   }
 
   return (
-    <Card className="relative border rounded-lg bg-white hover:shadow-lg transition-all duration-300 hover:-translate-y-1" style={{ borderColor: '#0D0A53' }}>
+    <Card className="relative border rounded-lg bg-white hover:shadow-lg transition-all duration-300 hover:-translate-y-1 w-full h-full flex flex-col" style={{ borderColor: '#0D0A53' }}>
       {/* Navy triangle in top-right corner */}
-      <div className="absolute top-0 right-0 w-0 h-0 border-l-[20px] border-l-transparent border-b-[20px]" style={{ borderBottomColor: '#0D0A53' }}></div>
+      <div className="absolute top-0 right-0 w-0 h-0 border-l-[16px] sm:border-l-[20px] border-l-transparent border-b-[16px] sm:border-b-[20px]" style={{ borderBottomColor: '#0D0A53' }}></div>
       
-      <CardHeader className="pb-4">
-        <div className="flex flex-col items-start space-y-4">
+      <CardHeader className="pb-3 sm:pb-4 p-4 sm:p-6">
+        <div className="flex flex-col items-start space-y-3 sm:space-y-4">
           {/* Icon */}
-          <div className="w-12 h-12 rounded flex items-center justify-center" style={{ backgroundColor: '#FCF7F7', border: '2px solid #0D0A53' }}>
-            <FileText className="h-6 w-6" style={{ color: '#0D0A53' }} />
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded flex items-center justify-center" style={{ backgroundColor: '#FCF7F7', border: '2px solid #0D0A53' }}>
+            <FileText className="h-5 w-5 sm:h-6 sm:w-6" style={{ color: '#0D0A53' }} />
           </div>
           
           {/* Title */}
-          <CardTitle className="text-xl font-bold leading-tight" style={{ color: '#0D0A53' }}>
+          <CardTitle className="text-lg sm:text-xl font-bold leading-tight line-clamp-2" style={{ color: '#0D0A53' }}>
             {resource.title}
           </CardTitle>
           
           {/* Description */}
           {resource.description && (
-            <CardDescription className="text-sm leading-relaxed" style={{ color: '#0D0A53' }}>
+            <CardDescription className="text-xs sm:text-sm leading-relaxed line-clamp-3" style={{ color: '#0D0A53' }}>
               {resource.description}
             </CardDescription>
           )}
           
           {/* Type Badge */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <Badge className="text-xs px-2 py-1 rounded-full" style={{ backgroundColor: '#FCF7F7', color: '#0D0A53', border: '1px solid #0D0A53' }}>
               {resource.type}
             </Badge>
@@ -307,9 +307,9 @@ export function ResourceCard({ resource }: ResourceCardProps) {
           </div>
           
           {/* Stats */}
-          <div className="flex items-center gap-4 text-sm" style={{ color: '#0D0A53' }}>
+          <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm" style={{ color: '#0D0A53' }}>
             <div className="flex items-center gap-1">
-              <Download className="h-4 w-4" style={{ color: '#C7A600' }} />
+              <Download className="h-3 w-3 sm:h-4 sm:w-4" style={{ color: '#C7A600' }} />
               <span>{Math.floor(resource.id.charCodeAt(0) * 7) % 1000 + 100}</span>
             </div>
             <div className="flex items-center gap-1">
@@ -320,7 +320,7 @@ export function ResourceCard({ resource }: ResourceCardProps) {
         </div>
       </CardHeader>
       
-      <CardContent className="pt-0">
+      <CardContent className="pt-0 px-4 sm:px-6 pb-4 sm:pb-6 mt-auto">
         <div className="w-full">
           {getActionButton()}
         </div>

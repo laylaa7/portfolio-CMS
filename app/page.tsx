@@ -27,28 +27,28 @@ export default async function HomePage() {
               <Award className="mr-2 h-4 w-4" />
               ATP-Certified Coach
             </Badge>
-            <h1 className="mb-8 text-5xl font-bold tracking-tight text-primary-foreground md:text-6xl lg:text-7xl text-balance leading-[1.1]">
+            <h1 className="mb-6 sm:mb-8 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-primary-foreground text-balance leading-[1.1]">
               Empowering Learning Professionals to <span className="text-accent">Thrive</span>
             </h1>
-            <p className="mb-12 text-xl md:text-2xl text-primary-foreground/90 leading-relaxed text-pretty max-w-3xl mx-auto">
+            <p className="mb-8 sm:mb-12 text-base sm:text-lg md:text-xl lg:text-2xl text-primary-foreground/90 leading-relaxed text-pretty max-w-3xl mx-auto px-4 sm:px-0">
               Custom L&D programs, ATP-certified coaching, and career mentoring for talent development leaders in MENA
               and beyond.
             </p>
-            <div className="flex flex-col gap-5 sm:flex-row sm:justify-center sm:gap-6">
+            <div className="flex flex-col gap-4 sm:gap-5 sm:flex-row sm:justify-center px-4 sm:px-0">
               <Button
                 asChild
                 size="lg"
-                className="bg-accent text-primary hover:bg-accent/90 font-semibold text-lg px-10 h-14 shadow-lg hover:shadow-xl transition-all"
+                className="bg-accent text-primary hover:bg-accent/90 font-semibold text-base sm:text-lg px-6 sm:px-10 h-12 sm:h-14 shadow-lg hover:shadow-xl transition-all"
               >
                 <Link href="/services">
-                  Explore Services <ArrowRight className="ml-2 h-5 w-5" />
+                  Explore Services <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
                 </Link>
               </Button>
               <Button
                 asChild
                 size="lg"
                 variant="outline"
-                className="border-2 border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 bg-transparent font-semibold text-lg px-10 h-14"
+                className="border-2 border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 bg-transparent font-semibold text-base sm:text-lg px-6 sm:px-10 h-12 sm:h-14"
               >
                 <Link href="/events">Join a Live Session</Link>
               </Button>

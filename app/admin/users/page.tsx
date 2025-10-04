@@ -191,46 +191,115 @@ export default function AdminUsersPage() {
                 <p className="text-gray-500">No users found</p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Role</TableHead>
-                      <TableHead>Created</TableHead>
-                      <TableHead>Last Sign In</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {users.map((user) => (
-                      <TableRow key={user.id}>
-                        <TableCell className="font-medium">{user.email}</TableCell>
-                        <TableCell>{user.name}</TableCell>
-                        <TableCell>
+              <>
+                {/* Desktop Table */}
+                <div className="hidden lg:block overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Role</TableHead>
+                        <TableHead>Created</TableHead>
+                        <TableHead>Last Sign In</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {users.map((user) => (
+                        <TableRow key={user.id}>
+                          <TableCell className="font-medium">{user.email}</TableCell>
+                          <TableCell>{user.name}</TableCell>
+                          <TableCell>
+                            <Badge 
+                              className={user.role === 'admin' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}
+                            >
+                              {user.role}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {new Date(user.created_at).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell>
+                            {user.last_sign_in_at 
+                              ? new Date(user.last_sign_in_at).toLocaleDateString()
+                              : "Never"
+                            }
+                          </TableCell>
+                          <TableCell>
+                            <Select
+                              value={user.role}
+                              onValueChange={(newRole) => updateUserRole(user.id, newRole)}
+                              disabled={updating === user.id}
+                            >
+                              <SelectTrigger className="w-32">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="user">
+                                  <div className="flex items-center gap-2">
+                                    <UserX className="h-4 w-4" />
+                                    User
+                                  </div>
+                                </SelectItem>
+                                <SelectItem value="admin">
+                                  <div className="flex items-center gap-2">
+                                    <UserCheck className="h-4 w-4" />
+                                    Admin
+                                  </div>
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                            {updating === user.id && (
+                              <Loader2 className="h-4 w-4 animate-spin ml-2" />
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                {/* Mobile Cards */}
+                <div className="lg:hidden space-y-4">
+                  {users.map((user) => (
+                    <Card key={user.id} className="p-4">
+                      <div className="space-y-3">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-medium text-sm truncate">{user.email}</h3>
+                            <p className="text-xs text-gray-600 truncate">{user.name}</p>
+                          </div>
                           <Badge 
-                            className={user.role === 'admin' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}
+                            className={user.role === 'admin' ? 'bg-green-100 text-green-800 text-xs' : 'bg-blue-100 text-blue-800 text-xs'}
                           >
                             {user.role}
                           </Badge>
-                        </TableCell>
-                        <TableCell>
-                          {new Date(user.created_at).toLocaleDateString()}
-                        </TableCell>
-                        <TableCell>
-                          {user.last_sign_in_at 
-                            ? new Date(user.last_sign_in_at).toLocaleDateString()
-                            : "Never"
-                          }
-                        </TableCell>
-                        <TableCell>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
+                          <div>
+                            <span className="font-medium">Created:</span>
+                            <br />
+                            {new Date(user.created_at).toLocaleDateString()}
+                          </div>
+                          <div>
+                            <span className="font-medium">Last Sign In:</span>
+                            <br />
+                            {user.last_sign_in_at 
+                              ? new Date(user.last_sign_in_at).toLocaleDateString()
+                              : "Never"
+                            }
+                          </div>
+                        </div>
+                        
+                        <div className="pt-2 border-t">
                           <Select
                             value={user.role}
                             onValueChange={(newRole) => updateUserRole(user.id, newRole)}
                             disabled={updating === user.id}
                           >
-                            <SelectTrigger className="w-32">
+                            <SelectTrigger className="w-full">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -249,14 +318,16 @@ export default function AdminUsersPage() {
                             </SelectContent>
                           </Select>
                           {updating === user.id && (
-                            <Loader2 className="h-4 w-4 animate-spin ml-2" />
+                            <div className="flex items-center justify-center mt-2">
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            </div>
                           )}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </>
             )}
           </CardContent>
         </Card>

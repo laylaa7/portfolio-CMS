@@ -54,8 +54,8 @@ export default async function AdminDashboardPage() {
           <p className="text-muted-foreground">Manage your portfolio content from here</p>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5 mb-8">
+                {/* Stats Grid */}
+                <div className="grid gap-4 sm:gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 mb-6 sm:mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Services</CardTitle>
@@ -112,8 +112,8 @@ export default async function AdminDashboardPage() {
           </Card>
         </div>
 
-        {/* Management Links */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {/* Management Links */}
+                <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader>
               <Briefcase className="h-8 w-8 mb-2 text-primary" />
