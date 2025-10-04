@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { createClient } from "@/lib/supabase/client"
+import { useAuth } from "@/contexts/auth-context"
 import { generateSignedUrl, requestResourceAccess, getResourceAccessStatus } from "@/lib/resource-requests"
 import type { Resource, ResourceRequest } from "@/lib/types"
 import { 
@@ -24,23 +24,16 @@ interface ResourceCardProps {
 }
 
 export function ResourceCard({ resource }: ResourceCardProps) {
-  const [user, setUser] = useState<any>(null)
+  const { user, isAdmin } = useAuth()
   const [requestStatus, setRequestStatus] = useState<ResourceRequest | null>(null)
   const [loading, setLoading] = useState(false)
   const [downloading, setDownloading] = useState(false)
 
   useEffect(() => {
-    checkUser()
-    if (resource.visibility === 'protected') {
+    if (user && resource.visibility === 'protected') {
       checkRequestStatus()
     }
-  }, [resource.id])
-
-  const checkUser = async () => {
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    setUser(user)
-  }
+  }, [resource.id, user])
 
   const checkRequestStatus = async () => {
     try {
@@ -115,33 +108,78 @@ export function ResourceCard({ resource }: ResourceCardProps) {
   }
 
   const getActionButton = () => {
+    // Admin bypass - show direct download/edit options
+    if (isAdmin) {
+      return (
+        <div className="space-y-2">
+          <Button 
+            onClick={handleDownload} 
+            disabled={downloading}
+            className="w-full text-white font-medium h-10 rounded"
+            style={{ backgroundColor: '#0D0A53' }}
+          >
+            {downloading ? (
+              <>
+                <Clock className="mr-2 h-4 w-4 animate-spin" />
+                Downloading...
+              </>
+            ) : (
+              <>
+                <Download className="mr-2 h-4 w-4" />
+                Download
+              </>
+            )}
+          </Button>
+          <Button 
+            variant="outline"
+            className="w-full font-medium h-8 rounded text-xs"
+            style={{ borderColor: '#0D0A53', color: '#0D0A53' }}
+          >
+            Admin: Edit Resource
+          </Button>
+        </div>
+      )
+    }
+
+    // Public resources - anyone can download
     if (resource.visibility === 'public') {
       return (
         <Button 
           onClick={handleDownload} 
+          disabled={downloading}
           className="w-full text-white font-medium h-10 rounded"
           style={{ backgroundColor: '#0D0A53' }}
         >
-          <Download className="mr-2 h-4 w-4" />
-          Download Free
+          {downloading ? (
+            <>
+              <Clock className="mr-2 h-4 w-4 animate-spin" />
+              Downloading...
+            </>
+          ) : (
+            <>
+              <Download className="mr-2 h-4 w-4" />
+              Download Free
+            </>
+          )}
         </Button>
       )
     }
 
-    // Protected resource
+    // Protected resources
     if (!user) {
       return (
         <Button 
-          onClick={handleRequestAccess} 
+          onClick={() => window.location.href = '/login'} 
           className="w-full text-white font-medium h-10 rounded"
           style={{ backgroundColor: '#0D0A53' }}
         >
-          <User className="mr-2 h-4 w-4" />
-          Sign In to Request Access
+          <Lock className="mr-2 h-4 w-4" />
+          Sign in for Access
         </Button>
       )
     }
 
+    // Logged in user - show request access button
     if (!requestStatus) {
       return (
         <Button 
@@ -157,7 +195,7 @@ export function ResourceCard({ resource }: ResourceCardProps) {
             </>
           ) : (
             <>
-              <Lock className="mr-2 h-4 w-4" />
+              <User className="mr-2 h-4 w-4" />
               Request Access
             </>
           )}

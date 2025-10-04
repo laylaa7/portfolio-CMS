@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
-import { Briefcase, Calendar, BookOpen, FileText, User, LogOut } from "lucide-react"
+import { Briefcase, Calendar, BookOpen, FileText, Users, User as UserIcon, LogOut } from "lucide-react"
 
 export default async function AdminDashboardPage() {
   const supabase = await createClient()
@@ -21,6 +21,10 @@ export default async function AdminDashboardPage() {
   const { count: eventsCount } = await supabase.from("events").select("*", { count: "exact", head: true })
   const { count: blogsCount } = await supabase.from("blogs").select("*", { count: "exact", head: true })
   const { count: resourcesCount } = await supabase.from("resources").select("*", { count: "exact", head: true })
+  
+  // Get user count (this will be approximate since we can't count auth.users directly)
+  const { data: { users } } = await supabase.auth.admin.listUsers()
+  const usersCount = users.length
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -51,7 +55,7 @@ export default async function AdminDashboardPage() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Services</CardTitle>
@@ -93,6 +97,17 @@ export default async function AdminDashboardPage() {
             <CardContent>
               <div className="text-2xl font-bold">{resourcesCount || 0}</div>
               <p className="text-xs text-muted-foreground">Total resources</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">Users</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{usersCount || 0}</div>
+              <p className="text-xs text-muted-foreground">Total users</p>
             </CardContent>
           </Card>
         </div>
@@ -153,7 +168,20 @@ export default async function AdminDashboardPage() {
 
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader>
-              <User className="h-8 w-8 mb-2 text-primary" />
+              <Users className="h-8 w-8 mb-2 text-primary" />
+              <CardTitle>Manage Users</CardTitle>
+              <CardDescription>Manage user accounts and roles</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button asChild className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90">
+                <Link href="/admin/users">Manage Users</Link>
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <UserIcon className="h-8 w-8 mb-2 text-primary" />
               <CardTitle>Edit About</CardTitle>
               <CardDescription>Update bio and contact info</CardDescription>
             </CardHeader>

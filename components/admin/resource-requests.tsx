@@ -43,18 +43,49 @@ export function ResourceRequestsManager() {
   const fetchRequests = async () => {
     try {
       const supabase = createClient()
-      const { data, error } = await supabase
-        .from("resource_requests")
-        .select("*")
-        .order("created_at", { ascending: false })
+      
+      // First try to get requests with the view
+      let data, error
+      
+      try {
+        const result = await supabase
+          .from("resource_requests_with_details")
+          .select("*")
+          .order("created_at", { ascending: false })
+        data = result.data
+        error = result.error
+      } catch (viewError) {
+        console.log("View not found, trying direct table query")
+        
+        // Fallback to direct table query
+        const result = await supabase
+          .from("resource_requests")
+          .select("*")
+          .order("created_at", { ascending: false })
+        data = result.data
+        error = result.error
+      }
 
       if (error) throw error
       
       // Transform data to match expected format
       const transformedData = (data || []).map(request => ({
-        ...request,
-        user: { email: "user@example.com" }, // Placeholder
-        resource: { title: "Resource", visibility: "protected" } // Placeholder
+        id: request.id,
+        user_id: request.user_id,
+        resource_id: request.resource_id,
+        status: request.status,
+        expires_at: request.expires_at,
+        admin_notes: request.admin_notes,
+        created_at: request.created_at,
+        updated_at: request.updated_at,
+        user: { 
+          email: request.user_email || "Loading...",
+          name: request.user_name || "Loading..."
+        },
+        resource: { 
+          title: request.resource_title || "Loading...", 
+          visibility: request.resource_visibility || "protected" 
+        }
       }))
       
       setRequests(transformedData)
@@ -131,7 +162,6 @@ export function ResourceRequestsManager() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">Resource request management will be available once the database is fully configured.</p>
           {requests.length === 0 ? (
             <p className="text-muted-foreground">No requests found.</p>
           ) : (

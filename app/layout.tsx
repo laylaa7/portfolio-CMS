@@ -5,6 +5,7 @@ import { GeistMono } from "geist/font/mono"
 import { Analytics } from "@vercel/analytics/next"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
+import { AuthProvider } from "@/contexts/auth-context"
 import { Suspense } from "react"
 import "./globals.css"
 
@@ -22,13 +23,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
-        <Suspense fallback={<div>Loading...</div>}>
-          <div className="flex min-h-screen flex-col">
-            <SiteHeader />
-            <main className="flex-1">{children}</main>
-            <SiteFooter />
-          </div>
-        </Suspense>
+        <AuthProvider>
+          <Suspense fallback={<div>Loading...</div>}>
+            <div className="flex min-h-screen flex-col">
+              <SiteHeader />
+              <main className="flex-1">{children}</main>
+              <SiteFooter />
+            </div>
+          </Suspense>
+        </AuthProvider>
         <Analytics />
       </body>
     </html>

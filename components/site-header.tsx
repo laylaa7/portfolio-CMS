@@ -3,8 +3,9 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Menu, X } from "lucide-react"
+import { Menu, X, User, LogOut, Settings } from "lucide-react"
 import { useState } from "react"
+import { useAuth } from "@/contexts/auth-context"
 
 const navigation = [
   { name: "Services", href: "/services" },
@@ -17,6 +18,7 @@ const navigation = [
 export function SiteHeader() {
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { user, isAdmin, signOut, loading } = useAuth()
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -43,8 +45,35 @@ export function SiteHeader() {
               )}
             </Link>
           ))}
+          {/* Always show auth buttons - no loading state */}
+          {user ? (
+            <div className="flex items-center gap-2 mr-2">
+              <span className="text-sm" style={{ color: '#0D0A53' }}>
+                {user.user_metadata?.name || user.email}
+              </span>
+              {isAdmin && (
+                <Button asChild size="sm" variant="outline" className="border-2" style={{ borderColor: '#0D0A53', color: '#0D0A53' }}>
+                  <Link href="/admin">Admin</Link>
+                </Button>
+              )}
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="border-2" 
+                style={{ borderColor: '#0D0A53', color: '#0D0A53' }}
+                onClick={signOut}
+              >
+                <LogOut className="h-4 w-4 mr-1" />
+                Logout
+              </Button>
+            </div>
+          ) : (
+            <Button asChild size="sm" variant="outline" className="border-2 mr-2" style={{ borderColor: '#0D0A53', color: '#0D0A53' }}>
+              <Link href="/login">Login</Link>
+            </Button>
+          )}
           <Button asChild size="sm" className="bg-accent text-primary hover:bg-accent/90 font-semibold mx-0 text-center">
-            <Link href="/contact">Get Started</Link>
+            <Link href="/contact">Contact</Link>
           </Button>
         </div>
 
@@ -75,8 +104,38 @@ export function SiteHeader() {
                 {item.name}
               </Link>
             ))}
+            {/* Mobile auth buttons - no loading state */}
+            {user ? (
+              <div className="space-y-2">
+                <div className="px-2 py-1 text-sm text-gray-500 border-b">
+                  {user.user_metadata?.name || user.email}
+                </div>
+                {isAdmin && (
+                  <Link
+                    href="/admin"
+                    className="block py-2 text-base font-semibold transition-colors hover:text-accent"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Admin Panel
+                  </Link>
+                )}
+                <button
+                  onClick={() => {
+                    signOut()
+                    setMobileMenuOpen(false)
+                  }}
+                  className="block py-2 text-base font-semibold transition-colors hover:text-accent text-left w-full"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <Button asChild size="sm" variant="outline" className="w-full border-2 mb-2" style={{ borderColor: '#0D0A53', color: '#0D0A53' }}>
+                <Link href="/login">Login</Link>
+              </Button>
+            )}
             <Button asChild size="sm" className="w-full bg-accent text-primary hover:bg-accent/90 font-semibold">
-              <Link href="/contact">Get Started</Link>
+              <Link href="/contact">Contact</Link>
             </Button>
           </div>
         </div>
