@@ -1,6 +1,6 @@
 "use client"
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react"
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { User as SupabaseUser, Session } from "@supabase/supabase-js"
 import { useRouter } from "next/navigation"
@@ -24,63 +24,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAdmin, setIsAdmin] = useState(false)
   const router = useRouter()
   const supabase = createClient()
-
-  useEffect(() => {
-    // Get initial session
-    const getInitialSession = async () => {
-      try {
-        const { data: { session }, error } = await supabase.auth.getSession()
-        if (error) {
-          console.error("Error getting session:", error)
-        }
-        
-        setSession(session)
-        setUser(session?.user || null)
-        
-        if (session?.user) {
-          // Check admin role from metadata first
-          const userRole = session.user.user_metadata?.role
-          if (userRole === 'admin') {
-            setIsAdmin(true)
-          } else {
-            setIsAdmin(false)
-          }
-        } else {
-          setIsAdmin(false)
-        }
-      } catch (error) {
-        console.error("Error in getInitialSession:", error)
-      } finally {
-        setLoading(false)
-      }
+  const checkUserRole = useCallback(async (user: SupabaseUser | null) => {
+    if (!user) {
+      setIsAdmin(false)
+      return
     }
 
-    getInitialSession()
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log("Auth state changed:", event, session?.user?.id)
-        
-        setSession(session)
-        setUser(session?.user || null)
-        
-        if (session?.user) {
-          // Check admin role from metadata
-          const userRole = session.user.user_metadata?.role
-          setIsAdmin(userRole === 'admin')
-        } else {
-          setIsAdmin(false)
-        }
-        
-        setLoading(false)
-      }
-    )
-
-    return () => subscription.unsubscribe()
-  }, [])
-
-  const checkUserRole = async (user: SupabaseUser) => {
     try {
       // Check if user has admin role in metadata
       const userRole = user.user_metadata?.role
@@ -106,7 +55,53 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error("Error checking user role:", error)
       setIsAdmin(false)
     }
-  }
+  }, [supabase])
+
+  useEffect(() => {
+    // Get initial session
+    const getInitialSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession()
+        if (error) {
+          console.error("Error getting session:", error)
+        }
+        
+        setSession(session)
+        setUser(session?.user || null)
+        // Determine role from metadata or users table
+        if (session?.user) {
+          await checkUserRole(session.user)
+        } else {
+          setIsAdmin(false)
+        }
+      } catch (error) {
+        console.error("Error in getInitialSession:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    getInitialSession()
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log("Auth state changed:", event, session?.user?.id)
+
+        setSession(session)
+        setUser(session?.user || null)
+
+        // Use checkUserRole to inspect metadata first then DB fallback
+        await checkUserRole(session?.user || null)
+
+        setLoading(false)
+      }
+    )
+
+    return () => subscription.unsubscribe()
+  }, [checkUserRole])
+
+  
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -118,6 +113,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (error) {
         return { user: null, error: error.message }
       }
+
+      // Update role state based on returned user
+      await checkUserRole(data.user || null)
 
       return { user: data.user, error: null }
     } catch (error: any) {
@@ -138,6 +136,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (error) {
         return { user: null, error: error.message }
       }
+
+      // Newly signed up user should not be admin, but keep state consistent
+      await checkUserRole(data.user || null)
 
       return { user: data.user, error: null }
     } catch (error: any) {

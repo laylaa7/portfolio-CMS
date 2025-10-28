@@ -52,7 +52,7 @@ export default function AdminUsersPage() {
         name: user.name || 'No name',
         role: user.role || 'user',
         created_at: user.created_at,
-        last_sign_in_at: null // We don't have this in public.users
+        last_sign_in_at: undefined // We don't have this in public.users
       }))
 
       setUsers(formattedUsers)
@@ -68,16 +68,17 @@ export default function AdminUsersPage() {
     setUpdating(userId)
     
     try {
-      const supabase = createClient()
-      
-      // Update user role in public.users table
-      const { error } = await supabase
-        .from('users')
-        .update({ role: newRole, updated_at: new Date().toISOString() })
-        .eq('id', userId)
+      // Call server API which updates both public.users and auth metadata
+      const res = await fetch('/api/admin/update-role', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, role: newRole })
+      })
 
-      if (error) {
-        throw error
+      const payload = await res.json()
+
+      if (!res.ok && !payload.warning) {
+        throw new Error(payload.error || 'Failed to update role')
       }
 
       // Update local state

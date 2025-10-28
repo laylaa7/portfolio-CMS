@@ -60,6 +60,22 @@ NEXT_PUBLIC_SUPABASE_URL=https://fydjsieyvnkwilrwwwnr.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIs...
 ```
 
+#### Local dev quick-check (no secrets returned)
+
+After creating `.env.local` you can confirm the running app sees the required variables by visiting:
+
+GET `/api/internal/env-check`
+
+It returns booleans only, e.g.:
+```
+{
+   "next_public_supabase_url": true,
+   "next_public_supabase_anon_key": true,
+   "supabase_service_role_key": false
+}
+```
+If `true` flags are present but your app still errors, restart your dev server (`npm run dev`) and try again.
+
 ### 6. If Still Not Working
 
 1. **Regenerate API keys** in Supabase:

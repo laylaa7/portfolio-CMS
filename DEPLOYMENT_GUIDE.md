@@ -43,6 +43,22 @@ NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here
 NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL=https://your-domain.vercel.app/admin
+
+### 2.4 Local development - .env.local
+
+For local development create a file at the project root named `.env.local` (do NOT commit it). You can copy the example file provided:
+
+```bash
+cp .env.local.example .env.local
+# then edit .env.local to set your real values
+```
+
+After updating `.env.local` restart your Next.js dev server (`npm run dev`).
+
+To confirm your running app can read the variables, use the internal endpoint added for debugging (server-only, returns presence flags only):
+
+- GET `/api/internal/env-check` → returns JSON like `{ next_public_supabase_url: true, next_public_supabase_anon_key: true, supabase_service_role_key: false }` (booleans only; no secrets are returned).
+
 ```
 
 ## Step 3: Deploy to Vercel
