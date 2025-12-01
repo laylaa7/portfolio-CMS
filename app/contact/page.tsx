@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Mail, Phone, Linkedin } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { createClient } from "@/lib/supabase/client"
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -17,16 +18,47 @@ export default function ContactPage() {
     subject: "",
     message: "",
   })
+  const [contactInfo, setContactInfo] = useState({ email: 'contact@example.com', phone: '+1 (234) 567-890', linkedin: '' })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+
+  useEffect(() => {
+    let mounted = true
+    const supabase = createClient()
+    const load = async () => {
+      try {
+        const { data } = await supabase.from('about').select('contact_info').single()
+        if (data?.contact_info && mounted) {
+          setContactInfo({
+            email: data.contact_info.email || 'contact@example.com',
+            phone: data.contact_info.phone || '+1 (234) 567-890',
+            linkedin: data.contact_info.linkedin || ''
+          })
+        }
+      } catch (err) {
+        console.warn('Failed to load contact_info', err)
+      }
+    }
+    load()
+    return () => { mounted = false }
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    setSubmitted(true)
-    setIsSubmitting(false)
+    try {
+      const res = await fetch('/api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(formData) })
+      const json = await res.json()
+      if (res.ok) {
+        setSubmitted(true)
+      } else {
+        console.error('Contact submit failed', json)
+      }
+    } catch (err) {
+      console.error('Submit error', err)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -124,8 +156,8 @@ export default function ContactPage() {
                   <Mail className="h-5 w-5 text-muted-foreground mt-0.5" />
                   <div>
                     <p className="font-medium">Email</p>
-                    <a href="mailto:contact@example.com" className="text-sm text-primary hover:underline">
-                      contact@example.com
+                    <a href={`mailto:${contactInfo.email}`} className="text-sm text-primary hover:underline">
+                      {contactInfo.email}
                     </a>
                   </div>
                 </div>
@@ -133,8 +165,8 @@ export default function ContactPage() {
                   <Phone className="h-5 w-5 text-muted-foreground mt-0.5" />
                   <div>
                     <p className="font-medium">Phone</p>
-                    <a href="tel:+1234567890" className="text-sm text-primary hover:underline">
-                      +1 (234) 567-890
+                    <a href={`tel:${contactInfo.phone}`} className="text-sm text-primary hover:underline">
+                      {contactInfo.phone}
                     </a>
                   </div>
                 </div>
@@ -143,7 +175,7 @@ export default function ContactPage() {
                   <div>
                     <p className="font-medium">LinkedIn</p>
                     <a
-                      href="https://linkedin.com"
+                      href={contactInfo.linkedin || 'https://linkedin.com'}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm text-primary hover:underline"

@@ -23,7 +23,7 @@ export default async function AdminBlogsPage() {
   return (
     <div className="min-h-screen bg-muted/30">
       <header className="border-b border-border/40 bg-background">
-        <div className="container flex h-16 items-center justify-between">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between">
           <div className="flex items-center gap-4">
             <Button asChild variant="ghost" size="sm">
               <Link href="/admin">
@@ -44,7 +44,7 @@ export default async function AdminBlogsPage() {
         </div>
       </header>
 
-      <main className="container py-8">
+  <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         {blogs && blogs.length > 0 ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {blogs.map((blog) => (
@@ -59,7 +59,7 @@ export default async function AdminBlogsPage() {
                   <p className="text-sm text-muted-foreground mb-4 line-clamp-3">{blog.content.substring(0, 150)}...</p>
                   {blog.tags && blog.tags.length > 0 && (
                     <div className="mb-4 flex flex-wrap gap-2">
-                      {blog.tags.slice(0, 3).map((tag) => (
+                      {blog.tags.slice(0, 3).map((tag: string) => (
                         <Badge key={tag} variant="outline" className="text-xs">
                           {tag}
                         </Badge>

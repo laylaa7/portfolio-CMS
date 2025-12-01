@@ -2,9 +2,14 @@ export interface Service {
   id: string
   title: string
   description: string
-  price?: string
   image_url?: string
   tools?: string[]
+  long_description?: string
+  features?: Array<{ title?: string; text?: string }>
+  outcomes?: Array<{ benefit?: string; text?: string }>
+  testimonial?: { quote?: string; author?: string; role?: string }
+  page_cta_text?: string
+  page_cta_link?: string
   created_at: string
 }
 

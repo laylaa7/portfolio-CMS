@@ -1,96 +1,57 @@
+// Compatibility wrapper: export the clean AboutForm implementation.
+export { AboutForm } from "./about-form-new"
+export { default } from "./about-form-new"
 "use client"
 
-import type React from "react"
-
+import React, { useEffect, useState } from "react"
+import RichText from "@/components/ui/rich-text"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { ImageUpload } from "@/components/ui/image-upload"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
-import type { About } from "@/lib/types"
+import { toast } from "sonner"
 
-export function AboutForm({ about }: { about?: About | null }) {
+type Section = { id: string; title: string; content_html: string; position?: number }
+
+export default function AboutForm() {
+  const supabase = createClient()
   const router = useRouter()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [formData, setFormData] = useState({
-    bio: about?.bio || "",
-    image_url: about?.image_url || "",
-    email: about?.contact_info?.email || "",
-    phone: about?.contact_info?.phone || "",
-    linkedin: about?.contact_info?.linkedin || "",
-  })
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [sections, setSections] = useState<Section[]>([])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-
-    const supabase = createClient()
-    const dataToSubmit = {
-      bio: formData.bio,
-      image_url: formData.image_url,
-      contact_info: {
-        email: formData.email,
-        phone: formData.phone,
-        linkedin: formData.linkedin,
-      },
-    }
-
-    if (about) {
-      const { error } = await supabase.from("about").update(dataToSubmit).eq("id", about.id)
-
+  useEffect(() => {
+    let mounted = true
+    const load = async () => {
+      setLoading(true)
+      const { data, error } = await supabase.from('about_sections').select('*').order('position', { ascending: true })
       if (error) {
-        alert("Error updating about page")
-        setIsSubmitting(false)
-        return
+        console.error('Error loading about sections:', error)
+        toast.error('Failed to load about sections')
+      } else if (data && mounted) {
+        setSections(data.map((d: any) => ({ id: d.id, title: d.title || '', content_html: d.content_html || '', position: d.position || 0 })))
       }
-    } else {
-      const { error } = await supabase.from("about").insert([dataToSubmit])
-
-      if (error) {
-        alert("Error creating about page")
-        setIsSubmitting(false)
-        return
-      }
+      setLoading(false)
     }
+    load()
+    return () => { mounted = false }
+  }, [supabase])
 
-    router.push("/admin")
-    router.refresh()
+  const addSection = () => {
+    const id = crypto.randomUUID()
+    setSections(prev => [...prev, { id, title: 'New section', content_html: '<p>Content</p>', position: prev.length }])
   }
 
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Edit About Page</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="bio">Bio *</Label>
-            <Textarea
-              id="bio"
-              rows={8}
-              value={formData.bio}
-              onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-              required
-            />
-          </div>
+  const removeSection = (id: string) => setSections(prev => prev.filter(s => s.id !== id))
 
-          <ImageUpload
-            value={formData.image_url}
-            onChange={(url) => setFormData({ ...formData, image_url: url })}
-            label="Profile Image"
-          />
+  const updateSection = (id: string, patch: Partial<Section>) => setSections(prev => prev.map(s => s.id === id ? { ...s, ...patch } : s))
 
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Contact Information</h3>
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (typeof window !== 'undefined' && !navigator.onLine) {
+      toast.error('You appear to be offline. Check your connection and try again.')
+      return
+    }
 
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
                 id="email"
                 type="email"
                 placeholder="contact@example.com"

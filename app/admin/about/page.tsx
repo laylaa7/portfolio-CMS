@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
-import { AboutForm } from "@/components/admin/about-form"
+import { AboutForm } from "@/components/admin/about-form-new"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
@@ -21,7 +21,7 @@ export default async function AdminAboutPage() {
   return (
     <div className="min-h-screen bg-muted/30">
       <header className="border-b border-border/40 bg-background">
-        <div className="container flex h-16 items-center gap-4">
+  <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex h-16 items-center gap-4">
           <Button asChild variant="ghost" size="sm">
             <Link href="/admin">
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -32,7 +32,7 @@ export default async function AdminAboutPage() {
         </div>
       </header>
 
-      <main className="container py-8">
+  <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         <div className="mx-auto max-w-3xl">
           <AboutForm about={about} />
         </div>

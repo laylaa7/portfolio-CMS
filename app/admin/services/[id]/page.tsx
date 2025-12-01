@@ -26,7 +26,7 @@ export default async function EditServicePage({ params }: { params: Promise<{ id
   return (
     <div className="min-h-screen bg-muted/30">
       <header className="border-b border-border/40 bg-background">
-        <div className="container flex h-16 items-center gap-4">
+  <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex h-16 items-center gap-4">
           <Button asChild variant="ghost" size="sm">
             <Link href="/admin/services">
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -37,7 +37,7 @@ export default async function EditServicePage({ params }: { params: Promise<{ id
         </div>
       </header>
 
-      <main className="container py-8">
+  <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         <div className="mx-auto max-w-2xl">
           <ServiceForm service={service} />
         </div>

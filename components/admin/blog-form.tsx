@@ -85,7 +85,8 @@ export function BlogForm({ blog }: { blog?: Blog }) {
         <CardTitle>{blog ? "Edit Blog Post" : "Write New Post"}</CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="title">Title *</Label>
             <Input id="title" value={formData.title} onChange={(e) => handleTitleChange(e.target.value)} required />
@@ -151,7 +152,18 @@ export function BlogForm({ blog }: { blog?: Blog }) {
               Cancel
             </Button>
           </div>
-        </form>
+          </form>
+
+          {/* Live preview */}
+          <div>
+            <h3 className="text-lg font-semibold">Live preview</h3>
+            <div className="mt-4 border-2 p-4 rounded" style={{ borderColor: 'var(--preview-border)' }}>
+              {formData.image_url && <div className="mb-4"><img src={formData.image_url} className="w-full h-48 object-cover rounded" alt="preview"/></div>}
+              <h2 className="text-2xl font-bold mb-2">{formData.title || 'Post title'}</h2>
+              <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: formData.content || '<p>Post content</p>' }} />
+            </div>
+          </div>
+        </div>
       </CardContent>
     </Card>
   )

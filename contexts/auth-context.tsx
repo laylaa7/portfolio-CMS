@@ -75,7 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setIsAdmin(false)
         }
       } catch (error) {
-        console.error("Error in getInitialSession:", error)
+          console.error("Error in getInitialSession:", error)
       } finally {
         setLoading(false)
       }
@@ -119,12 +119,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       return { user: data.user, error: null }
     } catch (error: any) {
-      return { user: null, error: error.message }
+      // Log full error to help debug "Failed to fetch" network issues
+      console.error("signIn error:", error)
+      return { user: null, error: error.message || String(error) }
     }
   }
 
   const signUp = async (name: string, email: string, password: string) => {
     try {
+      // Prevent duplicate sign-ups for the same email by checking the users table first.
+      // This helps surface a clear message to the user when an account already exists
+      // for the provided email (for example if they previously signed up via another flow).
+      try {
+        const { data: existingUser, error: lookupError } = await supabase
+          .from('users')
+          .select('id')
+          .eq('email', email)
+          .maybeSingle()
+
+        if (lookupError) {
+          // Non-fatal: log and continue to attempt sign up. In some setups the users
+          // table may not be populated for all auth providers; we still want to avoid
+          // a confusing duplicate account when we can detect it.
+          console.error('Error checking existing user before signUp:', lookupError)
+        }
+
+        if (existingUser) {
+          return { user: null, error: 'This email is already registered. Please sign in instead.' }
+        }
+      } catch (err) {
+        console.error('Unexpected error when checking for existing user:', err)
+      }
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -142,7 +168,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       return { user: data.user, error: null }
     } catch (error: any) {
-      return { user: null, error: error.message }
+      // Log full error to help debug "Failed to fetch" network issues
+      console.error("signUp error:", error)
+      return { user: null, error: error.message || String(error) }
     }
   }
 

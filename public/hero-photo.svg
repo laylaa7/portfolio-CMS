@@ -1,0 +1,15 @@
+<!-- simple placeholder hero photo SVG -->
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="800" viewBox="0 0 600 800">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1">
+      <stop offset="0" stop-color="#f3f4f6" />
+      <stop offset="1" stop-color="#ffffff" />
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#g)" />
+  <g transform="translate(120,120)">
+    <rect x="0" y="0" width="360" height="560" rx="16" fill="#e6e9ef" />
+    <circle cx="180" cy="180" r="90" fill="#fff" stroke="#d1d5db" stroke-width="4" />
+    <rect x="40" y="300" width="280" height="220" rx="12" fill="#fff" stroke="#d1d5db" stroke-width="3" />
+  </g>
+</svg>

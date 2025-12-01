@@ -14,6 +14,8 @@ export default async function HomePage() {
   const events = allEvents?.slice(0, 3) || []
   const hasMoreEvents = (allEvents?.length || 0) > 3
   const { data: blogs } = await supabase.from("blogs").select("*").order("published_at", { ascending: false }).limit(3)
+  const { data: homepageRows } = await supabase.from('homepage').select('*').limit(1)
+  const homepage = homepageRows && homepageRows.length > 0 ? homepageRows[0] : null
 
   return (
     <div className="flex flex-col">
@@ -23,35 +25,87 @@ export default async function HomePage() {
 
         <div className="container relative z-10 px-6 mx-auto">
           <div className="mx-auto max-w-5xl text-center">
-            <Badge className="mb-8 bg-accent text-primary hover:bg-accent/90 text-sm px-5 py-2 font-semibold inline-flex items-center">
-              <Award className="mr-2 h-4 w-4" />
-              ATP-Certified Coach
-            </Badge>
-            <h1 className="mb-6 sm:mb-8 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-primary-foreground text-balance leading-[1.1]">
-              Empowering Learning Professionals to <span className="text-accent">Thrive</span>
-            </h1>
-            <p className="mb-8 sm:mb-12 text-base sm:text-lg md:text-xl lg:text-2xl text-primary-foreground/90 leading-relaxed text-pretty max-w-3xl mx-auto px-4 sm:px-0">
-              Custom L&D programs, ATP-certified coaching, and career mentoring for talent development leaders in MENA
-              and beyond.
-            </p>
+              {homepage && (homepage.title_main || homepage.title_highlight || homepage.hero_html) ? (
+                // Prefer structured fields when available, fallback to hero_html
+                (homepage.title_main || homepage.title_highlight) ? (
+                  <>
+                    {homepage.badge_label && (
+                      <Badge className="mb-8 bg-accent text-primary hover:bg-accent/90 text-sm px-5 py-2 font-semibold inline-flex items-center">
+                        <Award className="mr-2 h-4 w-4" />
+                        {homepage.badge_label}
+                      </Badge>
+                    )}
+                    <h1 className="mb-6 sm:mb-8 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-primary-foreground text-balance leading-[1.1]">
+                      {homepage.title_main} {homepage.title_highlight ? <span className="text-accent">{homepage.title_highlight}</span> : null}
+                    </h1>
+                    {homepage.subtitle && (
+                      <p className="mb-8 sm:mb-12 text-base sm:text-lg md:text-xl lg:text-2xl text-primary-foreground/90 leading-relaxed text-pretty max-w-3xl mx-auto px-4 sm:px-0">
+                        {homepage.subtitle}
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <div className="mb-8 sm:mb-12 text-base sm:text-lg md:text-xl lg:text-2xl text-primary-foreground/90 leading-relaxed text-pretty max-w-3xl mx-auto px-4 sm:px-0" dangerouslySetInnerHTML={{ __html: homepage.hero_html }} />
+                )
+              ) : (
+                <>
+                  <Badge className="mb-8 bg-accent text-primary hover:bg-accent/90 text-sm px-5 py-2 font-semibold inline-flex items-center">
+                    <Award className="mr-2 h-4 w-4" />
+                    ATP-Certified Coach
+                  </Badge>
+                  <h1 className="mb-6 sm:mb-8 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-primary-foreground text-balance leading-[1.1]">
+                    Empowering Learning Professionals to <span className="text-accent">Thrive</span>
+                  </h1>
+                  <p className="mb-8 sm:mb-12 text-base sm:text-lg md:text-xl lg:text-2xl text-primary-foreground/90 leading-relaxed text-pretty max-w-3xl mx-auto px-4 sm:px-0">
+                    Custom L&D programs, ATP-certified coaching, and career mentoring for talent development leaders in MENA
+                    and beyond.
+                  </p>
+                </>
+              )}
             <div className="flex flex-col gap-4 sm:gap-5 sm:flex-row sm:justify-center px-4 sm:px-0">
-              <Button
-                asChild
-                size="lg"
-                className="bg-accent text-primary hover:bg-accent/90 font-semibold text-base sm:text-lg px-6 sm:px-10 h-12 sm:h-14 shadow-lg hover:shadow-xl transition-all"
-              >
-                <Link href="/services">
-                  Explore Services <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
-                </Link>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="border-2 border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 bg-transparent font-semibold text-base sm:text-lg px-6 sm:px-10 h-12 sm:h-14"
-              >
-                <Link href="/events">Join a Live Session</Link>
-              </Button>
+              {/* Primary CTA comes from structured homepage fields when available */}
+              {homepage?.primary_cta_label ? (
+                <Button
+                  asChild
+                  size="lg"
+                  className="bg-accent text-primary hover:bg-accent/90 font-semibold text-base sm:text-lg px-6 sm:px-10 h-12 sm:h-14 shadow-lg hover:shadow-xl transition-all"
+                >
+                  <Link href={homepage?.primary_cta_url || '/services'}>
+                    {homepage?.primary_cta_label} <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
+                  </Link>
+                </Button>
+              ) : (
+                <Button
+                  asChild
+                  size="lg"
+                  className="bg-accent text-primary hover:bg-accent/90 font-semibold text-base sm:text-lg px-6 sm:px-10 h-12 sm:h-14 shadow-lg hover:shadow-xl transition-all"
+                >
+                  <Link href={homepage?.hero_cta_link || '/services'}>
+                    {homepage?.hero_cta_text || 'Explore Services'} <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
+                  </Link>
+                </Button>
+              )}
+
+              {/* Secondary CTA (structured) or fallback to events */}
+              {homepage?.secondary_cta_label ? (
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className="border-2 border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 bg-transparent font-semibold text-base sm:text-lg px-6 sm:px-10 h-12 sm:h-14"
+                >
+                  <Link href={homepage?.secondary_cta_url || '/events'}>{homepage?.secondary_cta_label}</Link>
+                </Button>
+              ) : (
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className="border-2 border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 bg-transparent font-semibold text-base sm:text-lg px-6 sm:px-10 h-12 sm:h-14"
+                >
+                  <Link href="/events">Join a Live Session</Link>
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -118,12 +172,7 @@ export default async function HomePage() {
                         {service.title}
                       </CardTitle>
                       
-                      {/* Price */}
-                      {service.price && (
-                        <CardDescription className="text-lg font-bold" style={{ color: '#C7A600' }}>
-                          {service.price}
-                        </CardDescription>
-                      )}
+                      {/* Price removed per design - pricing is not shown on public listings */}
                       
                       {/* Description */}
                       <CardDescription className="text-sm leading-relaxed" style={{ color: '#0D0A53' }}>
@@ -137,7 +186,7 @@ export default async function HomePage() {
                     {service.tools && service.tools.length > 0 && (
                       <div className="mb-6">
                         <div className="flex flex-wrap gap-2">
-                          {service.tools.slice(0, 3).map((tool, index) => (
+                          {service.tools.slice(0, 3).map((tool: string, index: number) => (
                             <Badge 
                               key={index} 
                               className="text-xs px-2 py-1 rounded-full" 
@@ -269,7 +318,7 @@ export default async function HomePage() {
                     {event.tools && event.tools.length > 0 && (
                       <div className="mb-6">
                         <div className="flex flex-wrap gap-2">
-                          {event.tools.slice(0, 3).map((tool, index) => (
+                            {event.tools.slice(0, 3).map((tool: string, index: number) => (
                             <Badge 
                               key={index} 
                               className="text-xs px-2 py-1 rounded-full" 
@@ -363,7 +412,7 @@ export default async function HomePage() {
                     </p>
                     {blog.tags && blog.tags.length > 0 && (
                       <div className="flex flex-wrap gap-2">
-                        {blog.tags.slice(0, 3).map((tag) => (
+                        {blog.tags.slice(0, 3).map((tag: string) => (
                           <Badge key={tag} variant="outline" className="text-xs border-accent/30 text-accent">
                             {tag}
                           </Badge>

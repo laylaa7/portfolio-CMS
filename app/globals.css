@@ -33,6 +33,8 @@
   --border: #f9f7f7;
   --input: #f9f7f7;
   --ring: #dbb700;
+  /* Preview border color used by admin live previews */
+  --preview-border: #16a34a; /* green-500 by default */
 
   /* Chart colors using palette variations */
   --chart-1: #dbb700;
@@ -54,40 +56,7 @@
   --sidebar-ring: #c7a600;
 }
 
-.dark {
-  --background: #0d0a53;
-  --foreground: #fcf7f7;
-  --card: #1a1570;
-  --card-foreground: #fcf7f7;
-  --popover: #1a1570;
-  --popover-foreground: #fcf7f7;
-  --primary: #c7a600;
-  --primary-foreground: #0d0a53;
-  --secondary: #2a2590;
-  --secondary-foreground: #fcf7f7;
-  --muted: #2a2590;
-  --muted-foreground: #b8b5d0;
-  --accent: #e6c200;
-  --accent-foreground: #0d0a53;
-  --destructive: #ef4444;
-  --destructive-foreground: #fcf7f7;
-  --border: #2a2590;
-  --input: #2a2590;
-  --ring: #e6c200;
-  --chart-1: #e6c200;
-  --chart-2: #fcf7f7;
-  --chart-3: #c7a600;
-  --chart-4: #a08900;
-  --chart-5: #f5d633;
-  --sidebar: #1a1570;
-  --sidebar-foreground: #fcf7f7;
-  --sidebar-primary: #c7a600;
-  --sidebar-primary-foreground: #0d0a53;
-  --sidebar-accent: #2a2590;
-  --sidebar-accent-foreground: #fcf7f7;
-  --sidebar-border: #2a2590;
-  --sidebar-ring: #e6c200;
-}
+/* dark mode CSS removed - site uses a single palette for now */
 
 @theme inline {
   --color-background: var(--background);

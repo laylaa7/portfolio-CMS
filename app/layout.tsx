@@ -6,6 +6,7 @@ import { Analytics } from "@vercel/analytics/next"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { AuthProvider } from "@/contexts/auth-context"
+// theme provider removed - dark mode disabled for now
 import { Suspense } from "react"
 import "./globals.css"
 

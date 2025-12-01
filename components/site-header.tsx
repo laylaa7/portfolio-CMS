@@ -75,6 +75,7 @@ export function SiteHeader() {
           <Button asChild size="sm" className="bg-accent text-primary hover:bg-accent/90 font-semibold text-xs xl:text-sm">
             <Link href="/contact">Contact</Link>
           </Button>
+          {/* theme disabled */}
         </div>
 
         {/* Tablet/Mobile Menu Button */}
@@ -130,9 +131,18 @@ export function SiteHeader() {
                 </button>
               </div>
             ) : (
-              <Button asChild size="sm" variant="outline" className="w-full border-2 mb-2" style={{ borderColor: '#0D0A53', color: '#0D0A53' }}>
-                <Link href="/login">Login</Link>
-              </Button>
+              <>
+                <Button asChild size="sm" variant="outline" className="w-full border-2 mb-2" style={{ borderColor: '#0D0A53', color: '#0D0A53' }}>
+                  <Link href="/login">Login</Link>
+                </Button>
+
+                {/* theme toggle removed */}
+                <div className="pt-2">
+                  <Button size="sm" variant="ghost" className="w-full" onClick={() => setMobileMenuOpen(false)}>
+                    Close
+                  </Button>
+                </div>
+              </>
             )}
             <Button asChild size="sm" className="w-full bg-accent text-primary hover:bg-accent/90 font-semibold">
               <Link href="/contact">Contact</Link>

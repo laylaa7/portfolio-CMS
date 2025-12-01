@@ -24,7 +24,7 @@ export default async function AdminEventsPage() {
   return (
     <div className="min-h-screen bg-muted/30">
       <header className="border-b border-border/40 bg-background">
-        <div className="container flex h-16 items-center justify-between">
+  <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between">
           <div className="flex items-center gap-4">
             <Button asChild variant="ghost" size="sm">
               <Link href="/admin">
@@ -45,7 +45,7 @@ export default async function AdminEventsPage() {
         </div>
       </header>
 
-      <main className="container py-8">
+  <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
           {/* Events Management */}
           <div>
